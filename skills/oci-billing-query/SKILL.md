@@ -288,13 +288,6 @@ For every query request, follow this exact workflow:
 | cost_list_price_cost | DECIMAL(38,9) | Total cost = cost_list_price × usage_billed_quantity |
 | cost_currency_code | VARCHAR | Currency code (e.g., CNY, USD) |
 
-### Cost Fields (Origin Currency)
-| Field | Type | Description |
-|-------|------|-------------|
-| origin_cost_list_price | DECIMAL(38,9) | Origin list price per unit |
-| origin_exchange_cost_list_price_cost | DECIMAL(38,9) | Origin total cost = origin_cost_list_price × usage_billed_quantity |
-| origin_exchange_cost_currency_code | VARCHAR | Origin currency code |
-
 ### Unit & Metric Fields
 | Field | Type | Description |
 |-------|------|-------------|
