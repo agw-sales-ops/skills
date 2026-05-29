@@ -144,28 +144,7 @@ COPY (
 ) TO 'tenant_analysis.csv' WITH (HEADER, FORMAT CSV);"
 ```
 
-### 5. Currency Comparison Analysis
-
-Compare local vs. origin currency costs:
-
-```bash
-duckdb -c "
-COPY (
-    SELECT
-        product_service,
-        SUM(cost_list_price_cost) as local_currency_cost,
-        SUM(origin_exchange_cost_list_price_cost) as origin_currency_cost,
-        ROUND(SUM(cost_list_price_cost) / NULLIF(SUM(origin_exchange_cost_list_price_cost), 0), 4) as exchange_rate_actual,
-        cost_currency_code,
-        origin_exchange_cost_currency_code
-    FROM sales_bills_db.sales_bills.v_bill_oci_detail
-    WHERE cost_date BETWEEN '<start_date>' AND '<end_date>'
-    GROUP BY product_service, cost_currency_code, origin_exchange_cost_currency_code
-    ORDER BY local_currency_cost DESC
-) TO 'currency_analysis.csv' WITH (HEADER, FORMAT CSV);"
-```
-
-### 6. Customer Analysis
+### 5. Customer Analysis
 
 Analyze costs by customer (supports fuzzy matching with LIKE):
 
@@ -188,7 +167,7 @@ COPY (
 ) TO 'customer_analysis.csv' WITH (HEADER, FORMAT CSV);"
 ```
 
-### 7. Region & Availability Domain Analysis
+### 6. Region & Availability Domain Analysis
 
 Analyze cost distribution by region:
 
@@ -209,7 +188,7 @@ COPY (
 ) TO 'region_analysis.csv' WITH (HEADER, FORMAT CSV);"
 ```
 
-### 8. Correction Data Analysis
+### 7. Correction Data Analysis
 
 Identify and analyze billing corrections:
 
@@ -306,4 +285,3 @@ For every query request, follow this exact workflow:
 - `customer_name` supports `LIKE` for fuzzy matching — useful when the exact name is unknown.
 - Always check `line_item_is_correction` if cost numbers look unexpected — corrections may inflate or deflate totals.
 - The `cost_list_price_cost` field is the primary cost metric for most analyses.
-- When comparing costs across currencies, use `origin_exchange_cost_list_price_cost` for the original currency values.
