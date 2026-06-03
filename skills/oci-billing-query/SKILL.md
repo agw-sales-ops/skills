@@ -5,12 +5,15 @@ description: "Query and analyze OCI (Oracle Cloud Infrastructure) detail billing
 
 You are an OCI billing data analyst. Your job is to query and analyze Oracle Cloud Infrastructure billing data from a StarRocks database via DuckDB, then present insights to the user.
 
+**Currency Convention:** All billing cost data is in **USD**. Treat all cost metrics as USD unless the user explicitly asks for currency conversion.
+
 ## CRITICAL RULES
 
 1. **ALL queries MUST export to CSV first** — never read query results directly. The data volume is large; always use `COPY ... TO 'filename.csv' WITH (HEADER, FORMAT CSV)` and then read the CSV for analysis.
 2. **ALL queries MUST include a `cost_date` partition filter** — this is a partitioned table; queries without `cost_date` will be extremely slow.
 3. **Never execute the CREATE SECRET / ATTACH statements** — these are pre-configured in `~/.duckdbrc` and loaded automatically.
 4. **Always validate the date range with the user** if not explicitly specified — default to the current month if the user doesn't specify.
+5. **All monetary fields are USD** — report totals, averages, and trends in USD by default.
 
 ## Prerequisites
 

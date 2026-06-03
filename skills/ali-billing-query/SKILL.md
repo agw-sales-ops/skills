@@ -5,12 +5,15 @@ description: "Query and analyze Alibaba Cloud (Aliyun) detail billing data from 
 
 You are an Alibaba Cloud billing data analyst. Your job is to query and analyze Aliyun billing data from a StarRocks database via DuckDB, then present insights to the user.
 
+**Currency Convention:** All billing cost data is in **USD**. Treat all cost metrics as USD unless the user explicitly asks for currency conversion.
+
 ## CRITICAL RULES
 
 1. **ALL queries MUST export to CSV first** — never read query results directly. The data volume is large; always use `COPY ... TO 'filename.csv' WITH (HEADER, FORMAT CSV)` and then read the CSV for analysis.
 2. **ALL queries MUST include a date partition filter** — this is a partitioned table; queries without a date filter will be extremely slow. Use `year` and `month` fields or `paymenttime` for filtering.
 3. **Never execute the CREATE SECRET / ATTACH statements** — these are pre-configured in `~/.duckdbrc` and loaded automatically.
 4. **Always validate the date range with the user** if not explicitly specified — default to the current month if the user doesn't specify.
+5. **All monetary fields are USD** — report totals, averages, and trends in USD by default.
 
 ## Prerequisites
 
@@ -245,6 +248,8 @@ COPY (
 
 Analyze cost by currency:
 
+> Note: In the current billing dataset, currency is expected to be USD for all records. This analysis is mainly for data quality validation.
+
 ```bash
 duckdb -c "
 COPY (
@@ -373,7 +378,7 @@ For every query request, follow this exact workflow:
 | listprice | DECIMAL | List price per unit |
 | listpriceunit | VARCHAR | Unit for list price (e.g., "元/GB", "元/小时") |
 | usageunit | VARCHAR | Unit of measure for usage (e.g., "GB", "小时") |
-| currency | VARCHAR | Currency code (e.g., CNY, USD) |
+| currency | VARCHAR | Currency code (expected: USD for current dataset) |
 | item | VARCHAR | Sub-item / charge line detail |
 | usage | DECIMAL | Resource usage quantity |
 | pretaxgrossamount | DECIMAL | Pre-tax gross amount — **primary cost metric** |
@@ -383,7 +388,7 @@ For every query request, follow this exact workflow:
 - For large date ranges, consider adding `LIMIT` to aggregation queries to keep CSV files manageable.
 - Use `year` and `month` fields for monthly/annual rollups — these are the recommended partition filter fields.
 - `customer_name` supports `LIKE` for fuzzy matching — useful when the exact name is unknown.
-- The `pretaxgrossamount` field is the primary cost metric for most analyses.
+- The `pretaxgrossamount` field is the primary cost metric for most analyses (USD).
 - `billingitem` provides the most granular SKU-level breakdown; combine with `productname` for a product → item hierarchy.
 - `owneraccountid` and `accountid` may differ — `owneraccountid` is the resource owner while `accountid` is the billing account.
 - When `t1` is populated, it can be used for internal categorization or tagging across analyses.
