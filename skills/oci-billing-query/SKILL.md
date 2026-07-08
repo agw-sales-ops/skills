@@ -232,6 +232,7 @@ For every query request, follow this exact workflow:
 | ptenancy | VARCHAR | Parent tenancy identifier |
 | tenant_name | VARCHAR | Tenant name |
 | customer_name | VARCHAR | Customer name (supports LIKE fuzzy search) |
+| order_customer_name | VARCHAR | Order customer name |
 | sales_name | VARCHAR | Sales rep name |
 | customer_type | VARCHAR | Customer type |
 
